@@ -1,0 +1,136 @@
+PLC Dev notes
+
+Ubuntu 20.04 x86 amd64
+
+Sudo apt-get update 
+sudo apt-get upgrade
+
+// INstall terminal multi windopw
+sudo apt-get install terminator
+
+set as default terminal emulator upon install
+
+// install build essentials - Make etc
+sudo apt-get install build-essential
+
+
+
+// Install ROS matching 20.04 - Noetic
+http://wiki.ros.org/noetic/Installation/Ubuntu
+
+Follow through the tut , no complications
+
+rqt may not work immediately out of the box, remove some of the PyQt5 package to get running
+pip uninstall PyQt5
+pip uninstall PyQt5-sip
+pip uninstall PyQtWebEngine
+
+
+
+
+//Install Aria 
+Link in the paper is not exact, the below has all the source code
+excluded ArNetworking from the build as throwing exceptions
+
+Aria is no longer maintained, but there is AriaCoda which is currently maintained by reedhedges
+
+install git and make a Depot sandbox dir
+git clone https://github.com/reedhedges/AriaCoda.git
+
+Extract form the readme file:
+
+To install AriaCoda from source code, use `sudo make install`.  This installs the
+`libAria.so` shared library (also with versioned files) into `/usr/local/lib`
+and, the header files in `/usr/local/include/Aria`. Robot parameter files
+are installed into `/usr/local/share/Aria/params`.
+Use `make install-doc` to install API reference documentation into
+`/usr/local/share/doc/Aria/doc`, `make install-utils`
+to install `demo` (as `ariaDemo`), `mtxPower`, and `seekurPower` into
+`/usr/local/bin`,
+`make install-python` to install the Python wrapper files, and `make
+install-java` to install the Java wrapper.   Run `make install-examples` to
+install the example program source code into
+`/usr/local/share/doc/Aria/examples`.  
+
+
+
+
+once cloned, make , sudo make install , made the examples
+make -o ./teleopActionsExample.cpp
+
+At this point the examples are compiled and available at ~/Depot/AriaCoda/examples and working. 
+sudo ./teleopActionsExample -rp /dev/ttyS1
+sudo ./gpsExample -gpsPort /dev/ttyACM0 -rp /dev/ttys1
+
+
+It will be easier at some stage to add the use netipc to the dialout group etc to avoid using sudo all the time.
+sudo chmod a+rw /dev/ttyS1
+sudo chmod a+rw /dev/ttyACM0
+
+
+//GPS driver 
+
+Could have used the gpsd daemon, but decided to go with nmea_navsat_driver
+sudo apt-get install ros-noetic-nmea-navsat-driver
+
+rosrun nmea_navsat_driver nmea_serial_driver _port:=/dev/ttyACM0 _baud:=9600
+
+check with rqt, the topic is published, easy ... \m/
+
+
+
+
+
+
+//Install DepthAi examples and ROS nodes for OAK-D camera
+Follow tutorial 
+https://github.com/luxonis/depthai
+
+Proof of concept and examples available in:
+~/Depot/depthai
+
+
+//ROSAria
+Objective is to test the teleop mode through ROS / ROS Aria
+Follow tutorial here:
+http://wiki.ros.org/ROSARIA/Tutorials/How%20to%20use%20ROSARIA
+
+Created instructor workspace, To discuss with the students so they make their own workspace, and way of locking them out. 
+
+Downloaded Rosaria as per instructions
+catkin_make 
+Compile without issue - providing you have the Aria lib preinstalled, ignore deb package DL , as deprecated. 
+
+
+Launch Terminator
+Create 4 terminals
+Launch roscore
+
+Launch rosaria
+rosrun rosaria RosAria _port:=/dev/ttyS1
+
+Launch teleop
+rosrun rosaria_client interface
+
+Potentially have to reconfigure the direction, somehow lost the reverse direction playing around with parameters of the interface... 
+
+
+
+// ROS and depthai
+revert to depth ai, but now integrating with ROS , follow tutorial there:
+https://github.com/luxonis/depthai-ros
+
+Follow through, but had to rein in the catkin_make to -j2 to avoid depleting RAM and swap.... 
+export ROS_PARALLEL_JOBS=-j2
+
+Run the example with RViz
+roslaunch depthai_examples stereo_node.launch
+
+
+ 
+
+
+
+
+
+
